@@ -451,62 +451,75 @@
   show link: set text(fill: link-color)
   show ref:  set text(fill: link-color)
 
-  // ── Outline (TOC) entry styling ───────────────────────────────────────────
-  // Chapters: bold.  Front/back matter (unnumbered): italic.  Others: normal.
-  // Appendix entries get "A", "B", … by reading state at the heading's location.
-  show outline.entry.where(level: 1): it => {
-    let unnumbered = it.element.func() == heading and it.element.numbering == none
-    if unnumbered {
-      v(3pt, weak: true)
-      emph(it)
-    } else {
-      v(6pt, weak: true)
-      // Re-build the entry so the chapter number is correct for appendices.
+  // ── Outline entry styling (TOC + LoF + LoT) ──────────────────────────────
+  // Single merged rule to ensure all entries are blue (linked).
+  //
+  // Level-1 numbered  (chapters/appendices): bold blue, extra space above.
+  // Level-1 unnumbered (LoF, LoT, References): italic blue, moderate space above.
+  // Level 2+ heading entries: blue (default indentation preserved via `it`).
+  // Figure entries (LoF/LoT body): bold label "Figure/Table X.Y:", blue link.
+  show outline.entry: it => {
+    if it.element.func() == figure {
+      // ── LoF / LoT body entries ─────────────────────────────────────────
       context {
         let loc = it.element.location()
-        let in-app = _in-appendix.at(loc)
-        let num = counter(heading).at(loc).first()
-        let num-str = if in-app { numbering("A", num) } else { str(num) }
+        let fig = it.element
         let pg = counter(page).at(loc).first()
-        strong(link(loc)[
-          #num-str
-          #h(1em)
-          #it.element.body
-          #box(width: 1fr, repeat[.])
-          #str(pg)
-        ])
+        let ch = counter(heading).at(loc).first()
+        let in-app = _in-appendix.at(loc)
+        let ch-str = if in-app { numbering("A", ch) } else { str(ch) }
+        let kind-counter = if fig.kind == image {
+          counter(figure.where(kind: image))
+        } else {
+          counter(figure.where(kind: table))
+        }
+        let fig-num = ch-str + "." + str(kind-counter.at(loc).first())
+        block(above: 4pt, below: 4pt,
+          link(loc)[
+            #text(weight: "bold")[#fig.supplement #fig-num:]
+            #h(0.5em)
+            #fig.caption.body
+            #box(width: 1fr, repeat[.])
+            #str(pg)
+          ]
+        )
       }
-    }
-  }
-
-  // ── List of Figures / List of Tables entry styling ───────────────────────
-  // By default Typst includes the full figure body in LoF/LoT entries.
-  // Override to show only "Figure X.Y: caption text .... page".
-  show outline.entry: it => {
-    if it.element.func() != figure { return it }
-    context {
-      let loc = it.element.location()
-      let fig = it.element
-      let pg = counter(page).at(loc).first()
-      // Compute chapter-prefixed figure number
-      let ch = counter(heading).at(loc).first()
-      let in-app = _in-appendix.at(loc)
-      let ch-str = if in-app { numbering("A", ch) } else { str(ch) }
-      let kind-counter = if fig.kind == image {
-        counter(figure.where(kind: image))
+    } else if it.level == 1 {
+      // ── TOC chapter-level entries ──────────────────────────────────────
+      let unnumbered = it.element.numbering == none
+      if unnumbered {
+        // Front/back matter (LoF, LoT, References) — italic blue
+        v(5pt)
+        context {
+          let loc = it.element.location()
+          let pg = counter(page).at(loc).first()
+          text(fill: link-color, emph(link(loc)[
+            #it.element.body
+            #box(width: 1fr, repeat[.])
+            #str(pg)
+          ]))
+        }
       } else {
-        counter(figure.where(kind: table))
+        // Numbered chapter/appendix — bold blue
+        v(6pt, weak: true)
+        context {
+          let loc = it.element.location()
+          let in-app = _in-appendix.at(loc)
+          let num = counter(heading).at(loc).first()
+          let num-str = if in-app { numbering("A", num) } else { str(num) }
+          let pg = counter(page).at(loc).first()
+          strong(link(loc)[
+            #num-str
+            #h(1em)
+            #it.element.body
+            #box(width: 1fr, repeat[.])
+            #str(pg)
+          ])
+        }
       }
-      let fig-num = ch-str + "." + str(kind-counter.at(loc).first())
-      block(above: 4pt, below: 4pt,
-        link(loc)[
-          #text(weight: "bold")[#fig.supplement #fig-num:]
-          #h(0.5em)
-          #fig.caption.body
-          #box(width: 1fr, repeat[.])
-          #str(pg)
-        ]
-      )
+    } else {
+      // ── TOC section / subsection entries (level 2+) — blue ────────────
+      text(fill: link-color)[#it]
     }
   }
 
