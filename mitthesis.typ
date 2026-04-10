@@ -452,12 +452,10 @@
   show ref:  set text(fill: link-color)
 
   // ── Outline entry styling (TOC + LoF + LoT) ──────────────────────────────
-  // Single merged rule to ensure all entries are blue (linked).
-  //
-  // Level-1 numbered  (chapters/appendices): bold blue, extra space above.
-  // Level-1 unnumbered (LoF, LoT, References): italic blue, moderate space above.
-  // Level 2+ heading entries: blue (default indentation preserved via `it`).
-  // Figure entries (LoF/LoT body): bold label "Figure/Table X.Y:", blue link.
+  // All entries are explicitly reconstructed for predictable indentation and
+  // blue link color. The main outline uses indent: none; indentation here
+  // mirrors the LaTeX report class TOC defaults:
+  //   Level 1: 0em   Level 2: 1.5em   Level 3: 3.8em   Level 4: 7.0em
   show outline.entry: it => {
     if it.element.func() == figure {
       // ── LoF / LoT body entries ─────────────────────────────────────────
@@ -484,42 +482,56 @@
           ]
         )
       }
-    } else if it.level == 1 {
-      // ── TOC chapter-level entries ──────────────────────────────────────
+    } else {
+      // ── TOC heading entries ────────────────────────────────────────────
       let unnumbered = it.element.numbering == none
-      if unnumbered {
-        // Front/back matter (LoF, LoT, References) — italic blue
-        v(5pt)
-        context {
-          let loc = it.element.location()
-          let pg = counter(page).at(loc).first()
-          text(fill: link-color, emph(link(loc)[
-            #it.element.body
-            #box(width: 1fr, repeat[.])
-            #str(pg)
-          ]))
-        }
-      } else {
-        // Numbered chapter/appendix — bold blue
-        v(6pt, weak: true)
-        context {
-          let loc = it.element.location()
-          let in-app = _in-appendix.at(loc)
-          let num = counter(heading).at(loc).first()
-          let num-str = if in-app { numbering("A", num) } else { str(num) }
-          let pg = counter(page).at(loc).first()
-          strong(link(loc)[
-            #num-str
-            #h(1em)
-            #it.element.body
-            #box(width: 1fr, repeat[.])
-            #str(pg)
-          ])
+      context {
+        let loc = it.element.location()
+        let pg = counter(page).at(loc).first()
+        let in-app = _in-appendix.at(loc)
+        let nums = counter(heading).at(loc)
+
+        if it.level == 1 {
+          if unnumbered {
+            // Front/back matter (LoF, LoT, References) — italic blue, flush left
+            block(above: 5pt, below: 0pt,
+              text(fill: link-color, emph(link(loc)[
+                #it.element.body
+                #box(width: 1fr, repeat[.])
+                #str(pg)
+              ]))
+            )
+          } else {
+            // Chapter/appendix — bold blue, flush left, extra space above
+            let num-str = if in-app { numbering("A", nums.first()) } else { str(nums.first()) }
+            [
+              #v(6pt, weak: true)
+              #strong(text(fill: link-color, link(loc)[
+                #num-str
+                #h(1em)
+                #it.element.body
+                #box(width: 1fr, repeat[.])
+                #str(pg)
+              ]))
+            ]
+          }
+        } else {
+          // Level 2, 3, 4 — indented blue (LaTeX report class indents)
+          let indent = if it.level == 2 { 1.5em } else if it.level == 3 { 3.8em } else { 7.0em }
+          let num-str = if not unnumbered {
+            if in-app { numbering("A.1.1", ..nums) } else { numbering("1.1.1", ..nums) }
+          } else { "" }
+
+          pad(left: indent,
+            text(fill: link-color, link(loc)[
+              #if not unnumbered [#num-str#h(0.5em)]
+              #it.element.body
+              #box(width: 1fr, repeat[.])
+              #str(pg)
+            ])
+          )
         }
       }
-    } else {
-      // ── TOC section / subsection entries (level 2+) — blue ────────────
-      text(fill: link-color)[#it]
     }
   }
 

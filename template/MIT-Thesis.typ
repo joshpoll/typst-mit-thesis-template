@@ -63,7 +63,7 @@
 // ─── Table of contents ───────────────────────────────────────────────────────
 #outline(
   title:  [Contents],
-  indent: auto,
+  indent: 0pt,
 )
 
 // ─── List of figures ─────────────────────────────────────────────────────────
