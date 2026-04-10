@@ -4,7 +4,7 @@ version = "0.1.0"
 authors = ["Josh Pollock <jopo@mit.edu>"]
 license = "MIT"
 description = "Typst port of the MIT mitthesis LaTeX template (v1.22). Produces a thesis document conforming to MIT Libraries dissertation formatting requirements."
-repository = "https://github.com/joshpoll/typst-mit-thesis-template"
+repository = "https://github.com/joshpoll/muddy-mit-thesis"
 keywords = ["thesis", "mit", "academic"]
 categories = ["paper"]
 compiler = ">=0.14.0"
