@@ -296,8 +296,11 @@
   show math.equation: set text(font: "New Computer Modern Math")
 
   set par(
-    leading:           0.65em,
-    spacing:           0pt,      // \parskip = 0pt (LaTeX default for report)
+    leading:           0.5em,    // 0.5em ≈ 14.5pt baseline-to-baseline (matches LaTeX \baselineskip)
+    spacing:           0.5em,    // must equal leading: in LaTeX \baselineskip governs ALL adjacent
+                                 // baselines (within and between paragraphs), so inter-para gap
+                                 // = line_height + spacing must equal line_height + leading
+                                 // (\parskip=0pt means no *extra* space beyond one baseline skip)
     first-line-indent: 1.5em,    // \parindent = 1.5em at 12pt
     justify:           true,
   )
