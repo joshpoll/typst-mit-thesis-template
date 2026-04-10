@@ -417,6 +417,9 @@
     },
   )
 
+  // ── Table captions above the table (LaTeX convention) ───────────────────
+  show figure.where(kind: table): set figure.caption(position: top)
+
   // ── Figure captions: bold label + colon, small text ──────────────────────
   // Mirrors mydesign.tex: labelfont=bf, labelsep=colon; caption text \small
   show figure.caption: it => {
