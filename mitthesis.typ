@@ -493,7 +493,7 @@
   // ── Raw (code listing) block styling ─────────────────────────────────────
   // Approximates listings package with light blue background (CadetBlue!15)
   show raw.where(block: true): it => {
-    set text(font: ("New Computer Modern Mono", "DejaVu Sans Mono", "Courier New"), size: 10pt)
+    set text(font: ("DejaVu Sans Mono", "Courier New"), size: 10pt)
     block(
       fill:    rgb("#D4E8E8"),
       width:   100%,
