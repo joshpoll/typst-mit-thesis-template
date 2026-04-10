@@ -103,8 +103,8 @@
 
     // ─ Degree / Institution block ─
     align(center)[
-      Submitted to #dept-line in partial fulfillment of the
-      requirements for the #deg-word of
+      Submitted to #dept-line \
+      in partial fulfillment of the requirements for the #deg-word of
       #v(7.5pt)
       #for d in degrees {
         tracked(d.name)
@@ -120,7 +120,16 @@
     v(12pt); v(2fr)
 
     // ─ Copyright ─
-    align(center)[© #degree-year #author-names. #cr-text]
+    // First line: "© year name. All rights reserved." (or CC license line)
+    // Second paragraph: MIT permission text
+    let cr-line = if cc-license != none {
+      [This work is licensed under a #cc-license.name license.]
+    } else {
+      [All rights reserved.]
+    }
+    align(center)[© #degree-year #author-names. #cr-line]
+    v(0.5em)
+    align(center)[#_mit-permission(authors.len())]
 
     v(18pt); v(2fr)
 
@@ -204,8 +213,8 @@
       #v(0.5em)
       #authors.map(a => a.name).join(" and ")
       #v(0.5em)
-      Submitted to #dept-line on #thesis-date in partial fulfillment of the
-      requirements for the #deg-word of
+      Submitted to #dept-line \
+      on #thesis-date in partial fulfillment of the requirements for the #deg-word of
       #v(6pt)
       #for d in degrees {
         tracked(d.name)
@@ -419,6 +428,10 @@
 
   // ── Table captions above the table (LaTeX convention) ───────────────────
   show figure.where(kind: table): set figure.caption(position: top)
+
+  // ── Multi-page tables: figures are non-breakable by default in Typst ─────
+  // Without this, a long table overflows the page bottom instead of breaking.
+  show figure.where(kind: table): set block(breakable: true)
 
   // ── Figure captions: bold label + colon, small text ──────────────────────
   // Mirrors mydesign.tex: labelfont=bf, labelsep=colon; caption text \small
