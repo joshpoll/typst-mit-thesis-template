@@ -15,7 +15,7 @@ Named after the [Muddy Charles](https://muddy.mit.edu/), the legendary MIT pub.
 ### Via Typst Universe (recommended)
 
 ```sh
-typst init @preview/muddy-mit-thesis:0.1.0
+typst init @preview/muddy-mit-thesis:0.2.0
 ```
 
 This copies the sample document into your working directory. Edit `MIT-Thesis.typ` and the included content files to write your thesis.
@@ -42,7 +42,7 @@ All parameters are passed to `#show: mitthesis.with(...)` in your main file:
 ### Helper functions
 
 ```typst
-#import "@preview/muddy-mit-thesis:0.1.0": mitthesis, start-appendix, tracked
+#import "@preview/muddy-mit-thesis:0.2.0": mitthesis, start-appendix, tracked
 
 // In the document body, before your first appendix:
 #start-appendix()  // switches numbering to A, B, … and resets chapter counter
@@ -50,6 +50,18 @@ All parameters are passed to `#show: mitthesis.with(...)` in your main file:
 // Letter-spaced uppercase text (used internally for degree/institution names):
 #tracked[Massachusetts Institute of Technology]
 ```
+
+### Heading hierarchy
+
+| Syntax | Renders as |
+|--------|-----------|
+| `= Part Title` | Part I (full divider page, vertically centred) |
+| `== Chapter Title` | Chapter 1 |
+| `=== Section` | 1.1 |
+| `==== Subsection` | 1.1.1 |
+| `===== Subsubsection` | (unnumbered) |
+
+Parts are optional — if you omit `=` headings, chapters at level `==` number from 1 as before.
 
 ## Page layout
 
